@@ -1,25 +1,20 @@
-apple
-ball
-banana
-yellow spoon
-blue car
-blue fork
-book
-bowl
+aeroplane
+bicycle
+bird
+boat
+bottle
+bus
 car
-coin
-dad
-dinosaur
+cat
+chair
+cow
+diningtable
 dog
-fire truck
-fork
-girl
-pencil
-pig
-red bus
-school bus
-spoon
-telephone
-toothbrush
-truck
-water bottle
+horse
+motorbike
+person
+pottedplant
+sheep
+sofa
+train
+tvmonitor
