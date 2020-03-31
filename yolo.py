@@ -27,7 +27,7 @@ import cv2
 
 class YOLO(object):
     _defaults = {
-        "model_path": 'logs/000/trained_weights.h5',
+        "model_path": 'model_data/yolo.h5',
         "anchors_path": 'model_data/yolo_anchors.txt',
         "classes_path": 'model_data/coco_classes.txt',
         "score": 0.3,
@@ -157,8 +157,8 @@ class YOLO(object):
             if video_fr is not None:
                 w = right - left
                 h = bottom - top
-                video_fr = cv2.resize(video_fr, (w // 2, h // 2))
-                video_fr_PIL = Image.fromarray(cv2.cvtColor(video_fr, cv2.COLOR_BGR2RGB))
+                video_fr_rz = cv2.resize(video_fr, (w // 2, h // 2))
+                video_fr_PIL = Image.fromarray(cv2.cvtColor(video_fr_rz, cv2.COLOR_BGR2RGB))
                 image.paste(video_fr_PIL, (left, top, left + video_fr_PIL.size[0], top + video_fr_PIL.size[1]))
             # print(label, (left, top), (right, bottom))
 
