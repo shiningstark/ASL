@@ -79,8 +79,11 @@ class App:
         ########  right_fm上进行第二层布局  #############
         # 以下是在right_fm上创建4个frame，自上而下布局
 
-        self.right_listbox_fm = Frame(self.right_fm, height=300, bg='#028090', bd=1)  # 用于放置视频中物体的label
+        self.right_listbox_fm = Frame(self.right_fm, bg='#028090', bd=1)  # 用于放置视频中物体的label
         self.right_listbox_fm.pack(side=TOP, fill=BOTH)
+
+        self.asl_fm = Frame(self.right_fm, bg='#028090', bd=1)  # 用于放置视频中物体的label
+        self.asl_fm.pack(side=TOP, fill=BOTH)
 
         self.right_log_fm = Frame(self.right_fm, bg='#028090')  # 放置显示日志控件的
         self.right_log_fm.pack(side=TOP, anchor=W, fill=X)
@@ -101,14 +104,23 @@ class App:
         # 在right_pic_fm上创建listbox, 用于显示label。
         self.listbox_label = Listbox(self.right_listbox_fm,
                                      selectmode=SINGLE,
-                                     width=100)
+                                     width=320)
         self.listbox_label.bind('<<ListboxSelect>>', handlerAdaptor(onselect, app=self))
-        self.listbox_label.pack(side=LEFT)
+        self.listbox_label.pack(side=RIGHT)
+
+        # create frame to show asl video
+        self.asl_video_label = Label(self.asl_fm,
+                                     bg='#05668D',
+                                     width=320,
+                                     # height=13,
+                                     relief=GROOVE
+                                     )
+        self.asl_video_label.pack(side=RIGHT)
 
         self.log_text = scrolledtext.ScrolledText(self.right_log_fm,
                                                   bg='#D3D3D3',
                                                   width=43,
-                                                  height=20,
+                                                  height=8,
                                                   padx=1, pady=1,
                                                   relief=GROOVE)
         self.log_text.pack(side=RIGHT)
@@ -117,7 +129,7 @@ class App:
         self.refresh_button = Button(self.right_bottom_fm,
                                      text='REFRESH',
                                      width=16,
-                                     height=20,
+                                     # height=20,
                                      font=('Arial', 12),
                                      command=self.refresh)
         self.refresh_button.pack(side=RIGHT, fill=BOTH)
@@ -125,7 +137,7 @@ class App:
         self.model_button = Button(self.right_bottom_fm,
                                    text='START',
                                    width=30,
-                                   height=20,
+                                   # height=20,
                                    font=('Arial', 12),
                                    command=self.switch_model)
         self.model_button.pack(side=LEFT, fill=BOTH)
@@ -136,28 +148,11 @@ class App:
 
         parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
 
-        parser.add_argument(
-            '--image', default=False, action="store_true",
-            help='Image detection mode, will ignore all positional arguments'
-        )
-        '''
-        Command line positional arguments -- for video detection mode
-        '''
-        parser.add_argument(
-            "--input", nargs='?', type=str, required=False, default='./invideo/multi_obj.MOV',
-            help="Video input path"
-        )
-
-        parser.add_argument(
-            "--output", nargs='?', type=str, default="./outvideo/1.MOV",
-            help="[Optional] Video output path"
-        )
-
         self.flag = parser.parse_args()
 
     # 初始化全局变量
     def _init_global_var(self):
-        self.video_path = './invideo/multi_obj.MOV'
+        self.video_path = './invideo/testyolo3.flv'
         self.url = None
         self.label = None
         self.yolo = YOLO(**vars(self.flag))
@@ -172,6 +167,9 @@ class App:
         self.data_path = './data.csv'
         self.data = pd.read_csv(self.data_path)
         self.labels = []
+        start_image = cv2.imread('./font/ASL.png')
+        self.start_image = cv2.resize(start_image, (320, 200))
+        self.asl_frame = self.start_image
 
         self.model = 2
 
@@ -187,8 +185,27 @@ class App:
         self.display_video_thread = threading.Thread(target=self.video_loop, args=())
         self.display_video_thread.setDaemon(True)
 
+        self.display_asl_video_thread = threading.Thread(target=self.asl_video_loop, args=())
+        self.display_asl_video_thread.setDaemon(True)
 
         self.display_video_thread.start()
+        self.display_asl_video_thread.start()
+
+    def asl_video_loop(self):
+        if self.asl_video is not None:
+            self.asl_video_fr_count += 1
+            if self.asl_video_fr_count == self.asl_video.get(cv2.CAP_PROP_FRAME_COUNT):
+                self.asl_video_fr_count = 0
+                self.asl_video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        self.asl_frame = cv2.resize(self.asl_frame, (320, 200))
+        video_fr_PIL = Image.fromarray(cv2.cvtColor(self.asl_frame, cv2.COLOR_BGR2RGB))
+
+        imgtk = ImageTk.PhotoImage(image=video_fr_PIL)
+        self.asl_video_label.imgtk = imgtk
+        self.asl_video_label.config(image=imgtk)
+        self.root.after(25, self.asl_video_loop)
+        # else:
+        #     self.show_log("No ASL Video!!")
 
     # 播放实时视频的方法
     def video_loop(self):
@@ -236,6 +253,7 @@ class App:
         self.listbox_label.delete(0, END)
         if self.model % 2 == 0:
             self.asl_video = None
+            self.asl_frame = self.start_image
             self.show_log("Recognition Close!!!")
         else:
             self.show_log("Recognition Open!!! Press Refresh and Please Select Object")
@@ -243,6 +261,7 @@ class App:
 
     def refresh(self):
         self.asl_video = None
+        self.asl_frame = self.start_image
         self.show_objectlist()
 
     def show_objectlist(self):
@@ -255,11 +274,15 @@ class App:
         self.asl_video_fr_count = 0
         self.label = self.listbox_label.get(listidx)
         index = self.data[self.data.LABELS.values == self.label].index.tolist()
-        self.url = self.data.URLS[index[0] % 25]
-        asl_v = pafy.new(self.url)
-        play = asl_v.getbest()
-        self.asl_video = cv2.VideoCapture(play.url)
-        self.show_log('You selected item %s: "%s"' % (self.label, self.url))
+        self.url = self.data.URLS[index[0]]
+        # asl_v = pafy.new(self.url)
+        # play = asl_v.getbest()
+        if self.url != 'none':
+            self.asl_video = cv2.VideoCapture(self.url)
+            self.show_log('You selected item %s: "%s"' % (self.label, self.url))
+        else:
+            self.asl_video = None
+            self.show_log('You selected item %s, but we do not find any ASL video' % (self.label))
 
     # 退出时调用的方法
     def destructor(self):
