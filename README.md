@@ -59,6 +59,7 @@ After showing list, users can choose special label to show. Then the system will
     path/to/img2.jpg 120,300,250,600,2
     ...
     ```
+    For windows system, you can download LabelImg to label your data and it will generate cooresponding xml file.
 
 2. Make sure you have run `python convert.py -w yolov3.cfg yolov3.weights model_data/yolo_weights.h5`  
     The file model_data/yolo_weights.h5 is used to load pretrained weights.
