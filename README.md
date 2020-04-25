@@ -4,7 +4,7 @@
 
 ## Introduction
 
-A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [allanzelener/YAD2K](https://github.com/allanzelener/YAD2K).
+A HCI project which aims to help parents teach DHH(deaf and hearing hard) children American Sign Language. Our project is trying to create a prototype based on paper <<Augmenting Communication Between Hearing Parents and Deaf Children>>. A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [allanzelener/YAD2K](https://github.com/allanzelener/YAD2K).
 
 
 ---
@@ -13,41 +13,24 @@ A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [allanzelener/
 
 1. Download YOLOv3 weights from [YOLO website](http://pjreddie.com/darknet/yolo/).
 2. Convert the Darknet YOLO model to a Keras model.
-3. Run YOLO detection.
+3. Run ASL_app.py.
 
 ```
 wget https://pjreddie.com/media/files/yolov3.weights
 python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
-python yolo_video.py [OPTIONS...] --image, for image detection mode, OR
-python yolo_video.py [video_path] [output_path (optional)]
+python ASL_app.py
+I set up video file path in ASL_app.py and model path in yolo.py. Others can change it for different usage.
 ```
-
-For Tiny YOLOv3, just do in a similar way, just specify model path and anchor path with `--model model_file` and `--anchors anchor_file`.
 
 ### Usage
-Use --help to see usage of yolo_video.py:
-```
-usage: yolo_video.py [-h] [--model MODEL] [--anchors ANCHORS]
-                     [--classes CLASSES] [--gpu_num GPU_NUM] [--image]
-                     [--input] [--output]
+1. Input video: For our project, it should be used for real-time video processing so there will be a camera to take video as input. If you want to use local video to test, just change code in ASL_app.py. If self.video_path is 0, it uses webcam. If it is 1, it uses extenal camera. If it is local path, it plays local video.
 
-positional arguments:
-  --input        Video input path
-  --output       Video output path
+![image](https://github.com/shiningstark/ASL/blob/master/font/WechatIMG16.jpeg)
 
-optional arguments:
-  -h, --help         show this help message and exit
-  --model MODEL      path to model weight file, default model_data/yolo.h5
-  --anchors ANCHORS  path to anchor definitions, default
-                     model_data/yolo_anchors.txt
-  --classes CLASSES  path to class definitions, default
-                     model_data/coco_classes.txt
-  --gpu_num GPU_NUM  Number of GPU to use, default 1
-  --image            Image detection mode, will ignore all positional arguments
-```
----
+2. 
 
-4. MultiGPU usage: use `--gpu_num N` to use N GPUs. It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
+
+4. MultiGPU usage: It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
 
 ## Training
 
@@ -68,8 +51,8 @@ optional arguments:
 
 3. Modify train.py and start training.  
     `python train.py`  
-    Use your trained weights or checkpoint weights with command line option `--model model_file` when using yolo_video.py
-    Remember to modify class path or anchor path, with `--classes class_file` and `--anchors anchor_file`.
+    Use your trained weights or checkpoint weights with modification weights path when using ASL_app.py
+    Remember to modify class path or anchor path.
 
 If you want to use original pretrained weights for YOLOv3:  
     1. `wget https://pjreddie.com/media/files/darknet53.conv.74`  
@@ -84,7 +67,7 @@ If you want to use original pretrained weights for YOLOv3:
 1. The test environment is
     - Python 3.5.6
     - Keras 2.1.6
-    - tensorflow 1.8.0
+    - tensorflow-gpu 1.8.0
 
 2. Default anchors are used. If you use your own anchors, probably some changes are needed.
 
@@ -92,7 +75,7 @@ If you want to use original pretrained weights for YOLOv3:
 
 4. The speed is slower than Darknet. Replacing PIL with opencv may help a little.
 
-5. Always load pretrained weights and freeze layers in the first stage of training. Or try Darknet training. It's OK if there is a mismatch warning.
+5. If you want to train your own model and don't freeze any layers, you can use train.py. Always load pretrained weights and freeze layers in the first stage of training. Or try Darknet training. It's OK if there is a mismatch warning.
 
 6. The training strategy is for reference only. Adjust it according to your dataset and your goal. And add further strategy if needed.
 
