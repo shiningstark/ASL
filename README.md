@@ -23,12 +23,26 @@ I set up video file path in ASL_app.py and model path in yolo.py. Others can cha
 ```
 
 ### Usage
-1. Input video: For our project, it should be used for real-time video processing so there will be a camera to take video as input. If you want to use local video to test, just change code in ASL_app.py. If self.video_path is 0, it uses webcam. If it is 1, it uses extenal camera. If it is local path, it plays local video.
+1. Input video: For our project, it should be used for real-time video processing so there will be a camera to take video as input. If you want to use local video to test, just change code in ASL_app.py. If self.video_path is 0, it uses webcam. If it is 1, it uses extenal camera. If it is local path, it plays local video. When our system work, the video will automatically play until closing window or video is over.
 
 ![image](https://github.com/shiningstark/ASL/blob/master/font/WechatIMG16.jpeg)
 
-2. 
+2. Mode: When users click 'START' button, it will change the mode. There are two mode: 1. object recognition 2 normal 
+In object recognition mode, system will recognize all objects in the video and local them as image blow.
 
+![image](https://github.com/shiningstark/ASL/blob/master/font/WechatIMG18.jpeg)
+
+when user want to use normal mode, just click again 'START' button, and the log information will show what mode it is now.
+
+3. Choose object: When user only want to recognize some special type object in video, click 'REFRESH' button and it will show a list in upper right where all the labels now in frame will show there.
+
+![image](https://github.com/shiningstark/ASL/blob/master/font/WechatIMG17.jpeg)
+
+And user can refresh the list by 'REFRESH' button.
+
+After showing list, users can choose special label to show. Then the system will only local that type and show ASL video in main video and middle of right. The video is about how to express the label by ASL.
+
+![image](https://github.com/shiningstark/ASL/blob/master/font/WechatIMG19.jpeg)
 
 4. MultiGPU usage: It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
 
